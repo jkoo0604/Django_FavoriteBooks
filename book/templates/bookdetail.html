@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Favorite Books: {{one_book.title}}</title>
+    {% load static %}
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'css/style-book.css' %}">
+    <!-- <link rel="stylesheet" href="/Users/jayoung/Desktop/Dojo_Assignments/Python/Django/Full_Stack/Favorite_Books/book/static/css/style-book.css"> -->
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg sticky-top navbar-dark bg-dark">
+        <a class="navbar-brand" href="/book">Welcome {{ current_user.first_name }}!</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <div class="navbar-nav mr-auto">
+            </div>
+            <span class="navbar-text">
+                <a href="/book/user">
+                    <svg class="bi bi-people-circle" width="1.5em" height="1.5em" viewBox="0 0 16 16" fill="white" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M13.468 12.37C12.758 11.226 11.195 10 8 10s-4.757 1.225-5.468 2.37A6.987 6.987 0 008 15a6.987 6.987 0 005.468-2.63z"/>
+                        <path fill-rule="evenodd" d="M8 9a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/>
+                        <path fill-rule="evenodd" d="M8 1a7 7 0 100 14A7 7 0 008 1zM0 8a8 8 0 1116 0A8 8 0 010 8z" clip-rule="evenodd"/>
+                    </svg>
+                </a>
+                <p><a href="/logout" class="logoutlink">Log Out</a></p>
+            </span>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="updatebookdiv">
+            {% if one_book.uploaded_by.id == current_user.id %}
+            <form action="/book/update/{{one_book.id}}" method="POST" class="updatebookform">
+                {% csrf_token %}
+                <div class="form-group row">
+                    <div class="col-sm-12">
+                        <input type="text" class="form-control" name="title" id="title" value="{{one_book.title}}">
+                    </div>
+                    {% for message in messages %}
+                    {% if message.extra_tags == "title" %}
+                    <span class="col-sm-12 text-danger"> {{ message|linebreaks }}</span>
+                    {% endif %}
+                    {% endfor %}
+                    <span class="col-sm-12 text-danger errtitle"></span>
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-4">
+                        Added by: 
+                    </div>
+                    <div class="col-sm-8">
+                        {{one_book.uploaded_by.first_name}} {{one_book.uploaded_by.last_name}}
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-4">
+                        Added on: 
+                    </div>
+                    <div class="col-sm-8">
+                        {{one_book.created_at|date:'F d, Y h:i A'}}
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-sm-4">
+                        Last Updated: 
+                    </div>
+                    <div class="col-sm-8">
+                        {{one_book.updated_at|date:'F d, Y h:i A'}}
+                    </div>
+                </div>               
+                <div class="form-group row">
+                    <label for="desc" class="col-sm-4 col-form-label">Descriptions</label>
+                    <div class="col-sm-8">
+                        <textarea name="desc" id="desc" rows="4" class="form-control">{{one_book.desc}}</textarea>
+                    </div>
+                    {% for message in messages %}
+                    {% if message.extra_tags == "desc" %}
+                    <span class="col-sm-12 text-danger"> {{ message|linebreaks }}</span>
+                    {% endif %}
+                    {% endfor %}
+                    <span class="col-sm-12 text-danger errdesc"></span>
+                </div>
+                <div class="updatebookbtn">
+                    <button class="btn btn-dark btn-sm addbtn" type="submit">Update</button>
+                    <a class="btn btn-dark btn-sm removebtn" href="/book/delete/{{one_book.id}}" role="button">Delete</a>
+                </div>
+            </form>
+            {% else %}
+            <div class="row">
+                <div class="col-sm-12 booktitle">
+                    {{one_book.title}}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-4">
+                    Added by: 
+                </div>
+                <div class="col-sm-8">
+                    {{one_book.uploaded_by.first_name}} {{one_book.uploaded_by.last_name}}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-4">
+                    Added on: 
+                </div>
+                <div class="col-sm-8">
+                    {{one_book.created_at|date:'F d, Y h:i A'}}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-4">
+                    Last Updated: 
+                </div>
+                <div class="col-sm-8">
+                    {{one_book.updated_at|date:'F d, Y h:i A'}}
+                </div>
+            </div>               
+            <div class="row">
+                <div class="col-sm-4">
+                    Descriptions
+                </div>
+                <div class="col-sm-8">
+                    {{one_book.desc}}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        <div class="bookdiv">
+            <p class="title">Users Who Like This Book:</p>
+            <div class="booklist">
+                <ul>
+                {% for key in one_book.liked_by.all %}
+                    <li>
+                        {{key.first_name}} {{key.last_name}}
+                        {% if key.id == current_user.id %}
+                            <a href="/book/removefavorite/{{one_book.id}}">
+                                <svg class="bi bi-heart-fill" width="1em" height="1em" viewBox="0 0 16 16" fill="black" xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z" clip-rule="evenodd"/>
+                                </svg> 
+                            </a>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+                </ul>
+            </div>
+            {% if not current_user in one_book.liked_by.all %}
+            <p class="favbook">
+                <a href="/book/addtofavorite/{{one_book.id}}">Add to Favorites</a>
+            </p>
+            {% endif %}          
+        </div>
+        <div class="back">
+            <a href="/book">Back</a>
+        </div>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+    <script src="{% static 'js/script-book.js' %}"></script>
+</body>
+</html>

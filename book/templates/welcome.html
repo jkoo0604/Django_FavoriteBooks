@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Favorite Books</title>
+    {% load static %}
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'css/style-book.css' %}">
+    <!-- <link rel="stylesheet" href="/Users/jayoung/Desktop/Dojo_Assignments/Python/Django/Full_Stack/Favorite_Books/book/static/css/style-book.css"> -->
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg sticky-top navbar-dark bg-dark">
+        <a class="navbar-brand" href="/book">Welcome {{ current_user.first_name }}!</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <div class="navbar-nav mr-auto">
+            </div>
+            <span class="navbar-text">
+                <a href="/book/user">
+                    <svg class="bi bi-people-circle" width="1.5em" height="1.5em" viewBox="0 0 16 16" fill="white" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M13.468 12.37C12.758 11.226 11.195 10 8 10s-4.757 1.225-5.468 2.37A6.987 6.987 0 008 15a6.987 6.987 0 005.468-2.63z"/>
+                        <path fill-rule="evenodd" d="M8 9a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/>
+                        <path fill-rule="evenodd" d="M8 1a7 7 0 100 14A7 7 0 008 1zM0 8a8 8 0 1116 0A8 8 0 010 8z" clip-rule="evenodd"/>
+                    </svg>
+                </a>
+                <p><a href="/logout" class="logoutlink">Log Out</a></p>
+            </span>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="addbookdiv">
+            <p class="title">Add a Favorite Book</p>
+            <form action="/book/addnew" method="POST" class="newbookform">
+                {% csrf_token %}
+                <div class="form-group row">
+                    <label for="title" class="col-sm-3 col-form-label">Title</label>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control" name="title" id="title">
+                    </div>
+                    {% for message in messages %}
+                    {% if message.extra_tags == "title" %}
+                    <span class="col-sm-12 text-danger"> {{ message|linebreaks }}</span>
+                    {% endif %}
+                    {% endfor %}
+                    <span class="col-sm-12 text-danger errtitle"></span>
+                </div>
+                <div class="form-group row">
+                    <label for="desc" class="col-sm-3 col-form-label">Descriptions</label>
+                    <div class="col-sm-9">
+                        <textarea name="desc" id="desc" rows="4" class="form-control"></textarea>
+                    </div>
+                    {% for message in messages %}
+                    {% if message.extra_tags == "desc" %}
+                    <span class="col-sm-12 text-danger"> {{ message|linebreaks }}</span>
+                    {% endif %}
+                    {% endfor %}
+                    <span class="col-sm-12 text-danger errdesc"></span>
+                </div>
+                <div class="newbookbtn">
+                    <button class="btn btn-dark btn-sm addbtn" type="submit">Add</button>
+                </div>
+            </form>
+        </div>
+        <div class="bookdiv">
+            <p class="title">All Books</p>
+            <div class="booklist">
+                {% for books in all_books %}
+                <div class="indivbook">
+                    <p class="booktitle">
+                        <a href="/book/{{books.id}}">{{books.title}}</a>
+                        <span class="favbool">
+                        {% if current_user in books.liked_by.all %}
+                        <a href="/book/removefavorite/{{books.id}}">
+                            <svg class="bi bi-heart-fill" width="1em" height="1em" viewBox="0 0 16 16" fill="black" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z" clip-rule="evenodd"/>
+                            </svg> 
+                        </a>  
+                        {% else %}
+                        <a href="/book/addtofavorite/{{books.id}}">
+                            <svg class="bi bi-heart" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M8 2.748l-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01L8 2.748zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143c.06.055.119.112.176.171a3.12 3.12 0 01.176-.17C12.72-3.042 23.333 4.867 8 15z" clip-rule="evenodd"/>
+                            </svg>
+                        </a>
+                        {% endif %}
+                        </span>
+                    </p>
+                    <p class="addedby">({{books.uploaded_by.first_name}} {{books.uploaded_by.last_name}})</p>
+                </div>
+                {% endfor %}
+            </div>          
+        </div>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+    <script src="{% static 'js/script-book.js' %}"></script>
+</body>
+</html>
